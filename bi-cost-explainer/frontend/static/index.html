@@ -1,381 +1,1802 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BI Cost Explainer</title>
-<!-- Optional: used only to draw A2UI Icon components. If it can't load (offline/
-     corp network), icons fall back to showing their name as text. -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
-<style>
-  :root {
-    --bg: #0b132b;
-    --surface: #162238;
-    --surface-hover: #1e2f4d;
-    --border: #233554;
-    --text: #e2e8f0;
-    --text-dim: #94a3b8;
-    --teal: #14b8a6;
-    --teal-light: #2dd4bf;
-    --amber: #f59e0b;
-    --amber-light: #fbbf24;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-  header {
-    background: var(--surface);
-    color: #fff;
-    padding: 0.9rem 1.4rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .brand-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    color: var(--teal-light);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .brand-subtitle {
-    font-size: 0.85rem;
-    color: var(--text-dim);
-    margin-top: 0.15rem;
-  }
-  #log {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1.2rem;
-    max-width: 820px;
-    width: 100%;
-    margin: 0 auto;
-  }
-  .msg { margin: 0.75rem 0; }
-  .msg.user { text-align: right; }
-  .bubble {
-    display: inline-block;
-    padding: 0.7rem 1rem;
-    border-radius: 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    text-align: left;
-    max-width: 90%;
-    white-space: pre-wrap;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.25);
-  }
-  .msg.user .bubble {
-    background: #0d5f57;
-    color: #f0fdfa;
-    border: 1px solid var(--teal);
-  }
-  /* When the reply is an A2UI card, drop the bubble chrome so the card stands alone. */
-  .bubble.rich {
-    background: transparent;
-    border: none;
-    padding: 0;
-    max-width: 100%;
-    white-space: normal;
-    box-shadow: none;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BI Cost Explainer — Modern BI Spend Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 
-  .chat-bottom {
-    border-top: 1px solid var(--border);
-    background: var(--surface);
-    padding: 0.75rem 1rem;
-    max-width: 820px;
-    width: 100%;
-    margin: 0 auto;
-  }
-  .examples-row {
-    display: flex;
-    gap: 0.5rem;
-    overflow-x: auto;
-    padding-bottom: 0.6rem;
-    scrollbar-width: thin;
-  }
-  .example-chip {
-    background: var(--bg);
-    color: var(--teal-light);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 0.35rem 0.85rem;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-  }
-  .example-chip:hover {
-    background: var(--surface-hover);
-    border-color: var(--amber);
-    color: var(--amber-light);
-    transform: translateY(-1px);
-  }
-  form {
-    display: flex;
-    gap: 0.5rem;
-  }
-  input {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 1rem;
-    background: var(--bg);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input:focus {
-    border-color: var(--teal);
-  }
-  input::placeholder {
-    color: #64748b;
-  }
-  button.send-btn {
-    padding: 0.75rem 1.3rem;
-    border: none;
-    border-radius: 8px;
-    background: var(--teal);
-    color: #0b132b;
-    font-size: 0.95rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  button.send-btn:hover {
-    background: var(--teal-light);
-  }
-  footer {
-    text-align: center;
-    padding: 0.5rem 1rem;
-    color: var(--text-dim);
-    font-size: 0.78rem;
-    background: var(--surface);
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
-  }
+  <style>
+    :root {
+      --bg: #0B1426;
+      --surface: #131F37;
+      --surface-elevated: #1A2946;
+      --surface-hover: #22355A;
+      --border: #202E4C;
+      --border-focus: #3B82F6;
+      --text: #F1F5F9;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      
+      --teal: #14B8A6;
+      --teal-dim: rgba(20, 184, 166, 0.15);
+      --amber: #F59E0B;
+      --amber-dim: rgba(245, 158, 11, 0.15);
+      --red: #EF4444;
+      --red-dim: rgba(239, 68, 68, 0.15);
+      --green: #10B981;
+      --green-dim: rgba(16, 185, 129, 0.15);
+      --blue: #3B82F6;
+      --purple: #8B5CF6;
+      --cyan: #06B6D4;
+      
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+    }
 
-  /* --- A2UI component styles (Card, Column, Row, Text, Divider, List, Image, Icon) --- */
-  .a2card {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.1rem;
-    background: var(--surface);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    max-width: 100%;
-  }
-  .a2card + .a2card, .a2col > .a2card { margin-top: 0.8rem; }
-  .a2col { display: flex; flex-direction: column; gap: 0.5rem; }
-  .a2row { display: flex; flex-direction: row; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
-  .a2row.between { justify-content: space-between; }
-  .a2text { margin: 0; line-height: 1.5; color: var(--text); }
-  .a2text.a2-h1 { font-size: 1.45rem; font-weight: 700; color: var(--teal-light); margin-bottom: 0.2rem; }
-  .a2text.a2-h2 { font-size: 1.2rem; font-weight: 600; color: var(--amber-light); margin-top: 0.2rem; }
-  .a2text.a2-h3 { font-size: 1.05rem; font-weight: 600; color: #e2e8f0; }
-  .a2text.a2-h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-dim); }
-  .a2text.a2-caption { font-size: 0.85rem; color: var(--text-dim); }
-  .a2divider { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0; width: 100%; }
-  .a2img { max-width: 100%; border-radius: 8px; display: block; border: 1px solid var(--border); }
-  .material-symbols-outlined { font-family: 'Material Symbols Outlined'; font-size: 1.25rem; line-height: 1; vertical-align: middle; color: var(--teal); }
-</style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Tabular numbers for all financial figures */
+    .num { font-variant-numeric: tabular-nums; }
+
+    /* Top App Header */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--teal), #0284c7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 8px rgba(20, 184, 166, 0.4);
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
+
+    .brand-text p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.6rem;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+    }
+
+    .control-label {
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    select.ctrl-select {
+      background: transparent;
+      color: var(--text);
+      border: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+    select.ctrl-select option {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .toggle-btn-group {
+      display: flex;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 2px;
+    }
+
+    .toggle-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.3rem 0.65rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .toggle-btn.active {
+      background: var(--teal);
+      color: #0b1426;
+      box-shadow: 0 2px 6px rgba(20, 184, 166, 0.35);
+    }
+
+    .settings-btn {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .settings-btn:hover {
+      color: var(--text);
+      border-color: var(--border-focus);
+    }
+
+    /* Main Split Layout: Desktop 65% / 35% */
+    .app-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 61px - 33px);
+      overflow: hidden;
+    }
+
+    /* Left Dashboard View */
+    .dashboard-pane {
+      flex: 0 0 65%;
+      width: 65%;
+      overflow-y: auto;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    /* Right Agent Chat Panel */
+    .chat-pane {
+      flex: 0 0 35%;
+      width: 35%;
+      border-left: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* Cards general */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Section 1: Insights on Start Strip */
+    .insights-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .insight-card {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .insight-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-focus);
+    }
+
+    .insight-card.red-driver { border-left: 4px solid var(--red); }
+    .insight-card.green-herring { border-left: 4px solid var(--green); }
+    .insight-card.amber-alert { border-left: 4px solid var(--amber); }
+
+    .insight-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.4rem;
+    }
+    .insight-card.red-driver .insight-badge { color: var(--red); }
+    .insight-card.green-herring .insight-badge { color: var(--green); }
+    .insight-card.amber-alert .insight-badge { color: var(--amber); }
+
+    .insight-headline {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.3rem;
+    }
+
+    .insight-detail {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+      margin-bottom: 0.75rem;
+      flex: 1;
+    }
+
+    .ask-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--teal);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.4rem 0.65rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      align-self: flex-start;
+      transition: all 0.2s;
+    }
+    .ask-btn:hover {
+      background: var(--teal);
+      color: #0b1426;
+      border-color: var(--teal);
+    }
+
+    /* Section 2: KPI Row */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+
+    .kpi-val-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+    }
+
+    .kpi-value {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .kpi-delta {
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .kpi-delta.up-bad { color: var(--red); background: var(--red-dim); }
+    .kpi-delta.down-good { color: var(--green); background: var(--green-dim); }
+    .kpi-delta.neutral { color: var(--text-muted); background: var(--surface-hover); }
+
+    .sparkline-wrapper {
+      height: 38px;
+      width: 100%;
+      margin-top: 0.3rem;
+    }
+    canvas.sparkline {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Section 3: Charts Layout Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .chart-container-tall {
+      position: relative;
+      height: 240px;
+      width: 100%;
+    }
+
+    .chart-container-quadrant {
+      position: relative;
+      height: 320px;
+      width: 100%;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Quadrant Legend & Info */
+    .quadrant-header-note {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      font-weight: 400;
+    }
+
+    /* Section 4: Top Drivers Table */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 0.5rem;
+    }
+
+    table.drivers-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      text-align: left;
+    }
+
+    table.drivers-table th {
+      padding: 0.6rem 0.75rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+    table.drivers-table th:hover {
+      color: var(--teal);
+    }
+
+    table.drivers-table td {
+      padding: 0.7rem 0.75rem;
+      border-bottom: 1px solid rgba(32, 46, 76, 0.5);
+      color: var(--text);
+    }
+
+    table.drivers-table tbody tr {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    table.drivers-table tbody tr:hover {
+      background: var(--surface-hover);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-scan { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-growth { background: var(--green-dim); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-schedule { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-normal { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); border: 1px solid var(--border); }
+
+    /* Right Chat Panel UI */
+    .chat-header {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-elevated);
+    }
+    .chat-header-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .agent-status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--green);
+    }
+
+    .chips-strip {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .chips-strip::-webkit-scrollbar { display: none; }
+    
+    .chat-chip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--teal);
+      font-size: 0.74rem;
+      font-weight: 500;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .chat-chip:hover {
+      background: var(--surface-hover);
+      color: #fff;
+      border-color: var(--teal);
+    }
+
+    #log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .msg { display: flex; flex-direction: column; }
+    .msg.user { align-items: flex-end; }
+    .msg.agent { align-items: flex-start; }
+
+    .bubble {
+      max-width: 90%;
+      padding: 0.75rem 1rem;
+      border-radius: 14px;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: var(--text);
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .msg.user .bubble {
+      background: #0D5F57;
+      color: #F0FDFA;
+      border: 1px solid var(--teal);
+      border-bottom-right-radius: 2px;
+    }
+    .msg.agent .bubble {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 2px;
+    }
+    .bubble.rich {
+      background: transparent;
+      border: none;
+      padding: 0;
+      max-width: 100%;
+      white-space: normal;
+    }
+
+    /* A2UI card styling */
+    .a2card {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.9rem;
+      margin: 0.4rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .a2row { display: flex; gap: 0.5rem; align-items: center; }
+    .a2row.between { justify-content: space-between; }
+    .a2col { display: flex; flex-direction: column; gap: 0.4rem; }
+    .a2text { font-size: 0.85rem; color: var(--text); }
+    .a2-h1 { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    .a2-h2 { font-size: 1.05rem; font-weight: 700; color: #fff; }
+    .a2-h3 { font-size: 0.95rem; font-weight: 600; color: var(--teal); }
+    .a2-caption { font-size: 0.75rem; color: var(--text-dim); }
+    .a2divider { border: 0; border-top: 1px solid var(--border); margin: 0.3rem 0; }
+    .a2img {
+      max-width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: block;
+      margin: 0.3rem 0;
+    }
+
+    /* Chat Input Form */
+    .chat-input-area {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .chat-input-form {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .chat-input {
+      flex: 1;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.84rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .chat-input:focus { border-color: var(--teal); }
+    .chat-send-btn {
+      background: var(--teal);
+      color: #0B1426;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0 1rem;
+      font-weight: 600;
+      font-size: 0.84rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .chat-send-btn:hover { background: #2DD4BF; }
+
+    /* Footer */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 0.45rem 1.5rem;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    /* Settings popover modal */
+    .settings-modal {
+      display: none;
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      width: 260px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      z-index: 100;
+    }
+    .settings-modal.open { display: block; }
+    .settings-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .settings-field { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.75rem; }
+    .settings-field label { font-size: 0.75rem; color: var(--text-muted); }
+    .settings-field input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.4rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hover) 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-load 1.5s infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton-load {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 1024px) {
+      .app-container {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+      }
+      .dashboard-pane {
+        flex: 1;
+        width: 100%;
+        height: auto;
+      }
+      .chat-pane {
+        flex: 1;
+        width: 100%;
+        height: 600px;
+        border-left: none;
+        border-top: 2px solid var(--border);
+      }
+      .insights-strip, .kpi-row, .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-<header>
-  <div class="brand-title">BI Cost Explainer</div>
-  <div class="brand-subtitle">Why did BI spend change? Answers from data, not guesses.</div>
-</header>
 
-<div id="log"></div>
+  <!-- App Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">BI</div>
+      <div class="brand-text">
+        <h1>BI Cost Explainer</h1>
+        <p>Why did BI spend change? Answers from data, not guesses.</p>
+      </div>
+    </div>
 
-<div class="chat-bottom">
-  <div class="examples-row">
-    <button type="button" class="example-chip" data-prompt="📊 Weekly report for 14 Sep">📊 Weekly report for 14 Sep</button>
-    <button type="button" class="example-chip" data-prompt="🔍 Why did costs rise?">🔍 Why did costs rise?</button>
-    <button type="button" class="example-chip" data-prompt="💶 Team breakdown in EUR">💶 Team breakdown in EUR</button>
+    <div class="header-controls">
+      <!-- Week Selector -->
+      <div class="control-group">
+        <span class="control-label">Week:</span>
+        <select id="weekSelector" class="ctrl-select">
+          <option value="">Loading weeks…</option>
+        </select>
+      </div>
+
+      <!-- Currency Toggle -->
+      <div class="toggle-btn-group">
+        <button type="button" class="toggle-btn active" id="btnUSD" onclick="setCurrency('USD')">$ USD</button>
+        <button type="button" class="toggle-btn" id="btnEUR" onclick="setCurrency('EUR')">€ EUR</button>
+      </div>
+
+      <!-- Settings button -->
+      <button type="button" class="settings-btn" id="settingsToggle" title="Settings" onclick="toggleSettings()">
+        <span class="material-symbols-outlined" style="font-size:18px;">tune</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Settings Popover -->
+  <div id="settingsModal" class="settings-modal">
+    <div class="settings-title">Threshold Settings</div>
+    <div class="settings-field">
+      <label for="thresholdInput">Alert Cost Increase Threshold (%)</label>
+      <input type="number" id="thresholdInput" min="5" max="100" value="20" step="5">
+    </div>
+    <button type="button" class="chat-send-btn" style="width:100%; padding:0.4rem;" onclick="saveSettings()">Save</button>
   </div>
-  <form id="form">
-    <input id="input" placeholder="Ask about BI costs, drivers, trends, or breakdowns…" autocomplete="off" autofocus>
-    <button class="send-btn" type="submit">Send</button>
-  </form>
-</div>
 
-<footer>All figures computed by tools · Illustrations generated by Gemini</footer>
+  <!-- Main App Split Container -->
+  <div class="app-container">
+    
+    <!-- LEFT: Dashboard Pane (65%) -->
+    <main class="dashboard-pane">
+      
+      <!-- 1. Insights on Start Strip -->
+      <section class="insights-strip" id="insightsStrip">
+        <!-- Card 1: Top Cost Driver -->
+        <div class="insight-card red-driver" id="cardTopDriver">
+          <div>
+            <div class="insight-badge">🔴 Top Cost Driver</div>
+            <div class="insight-headline" id="topDriverTitle">Analyzing…</div>
+            <div class="insight-detail" id="topDriverDetail">Checking period-over-period variances…</div>
+          </div>
+          <button type="button" class="ask-btn" id="askTopDriver">Ask agent why →</button>
+        </div>
 
-<script>
-const log = document.getElementById("log");
-const form = document.getElementById("form");
-const input = document.getElementById("input");
+        <!-- Card 2: Red-Herring Detector -->
+        <div class="insight-card green-herring" id="cardRedHerring">
+          <div>
+            <div class="insight-badge">🟢 Red-Herring Detector</div>
+            <div class="insight-headline" id="redHerringTitle">Analyzing…</div>
+            <div class="insight-detail" id="redHerringDetail">Evaluating query volume vs cost deltas…</div>
+          </div>
+          <button type="button" class="ask-btn" id="askRedHerring">Ask agent why →</button>
+        </div>
 
-function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+        <!-- Card 3: Alert Thresholds -->
+        <div class="insight-card amber-alert" id="cardAlertCount">
+          <div>
+            <div class="insight-badge">⚠️ Anomaly Alert</div>
+            <div class="insight-headline" id="alertCountTitle">0 Groups &gt; 20%</div>
+            <div class="insight-detail" id="alertCountDetail">Checking groups exceeding configured cost threshold…</div>
+          </div>
+          <button type="button" class="ask-btn" id="askAlertCount">Ask agent why →</button>
+        </div>
+      </section>
 
-function bubble(who) {
-  const m = el("div", "msg " + who);
-  const b = el("div", "bubble");
-  m.appendChild(b); log.appendChild(m); log.scrollTop = log.scrollHeight;
-  return b;
-}
+      <!-- 2. KPI Row with Micro Sparklines -->
+      <section class="kpi-row">
+        <!-- Total Cost -->
+        <div class="kpi-card">
+          <div class="kpi-label">TOTAL BI SPEND</div>
+          <div class="kpi-val-row">
+            <span class="kpi-value num" id="kpiTotalCost">$0</span>
+            <span class="kpi-delta neutral num" id="kpiCostDelta">--</span>
+          </div>
+          <div class="sparkline-wrapper">
+            <canvas id="sparkCost" class="sparkline"></canvas>
+          </div>
+        </div>
 
-/* ----------------------------------------------------------------------------
- * A2UI mini-renderer (v0.8 Basic Catalog subset).
- * Renders Card / Column / Row / Text / Divider / List / Image / Icon.
- * Anything else falls back to plain text (see renderReply). All text goes in via
- * textContent and image URLs are validated, so agent output can't inject HTML.
- * -------------------------------------------------------------------------- */
+        <!-- Cost Delta vs Prior Week -->
+        <div class="kpi-card">
+          <div class="kpi-label">SPEND VARIANCE (WoW)</div>
+          <div class="kpi-val-row">
+            <span class="kpi-value num" id="kpiVarianceVal">$0</span>
+            <span class="kpi-delta neutral num" id="kpiVariancePct">0.0%</span>
+          </div>
+          <div class="sparkline-wrapper">
+            <canvas id="sparkVariance" class="sparkline"></canvas>
+          </div>
+        </div>
 
-// A "bound value" is usually {literalString: "..."}; we only support literals.
-function boundStr(v) {
-  if (v == null) return "";
-  if (typeof v === "string") return v;
-  if (typeof v.literalString === "string") return v.literalString;
-  return "";
-}
+        <!-- GB Processed -->
+        <div class="kpi-card">
+          <div class="kpi-label">DATA SCANNED</div>
+          <div class="kpi-val-row">
+            <span class="kpi-value num" id="kpiTotalGb">0 GB</span>
+            <span class="kpi-delta neutral num" id="kpiGbDelta">--</span>
+          </div>
+          <div class="sparkline-wrapper">
+            <canvas id="sparkGb" class="sparkline"></canvas>
+          </div>
+        </div>
 
-// child ids of a component's props: single `child` and/or `children.explicitList`.
-function childIds(props) {
-  const ids = [];
-  if (props && typeof props.child === "string") ids.push(props.child);
-  const ch = props && props.children;
-  if (ch && Array.isArray(ch.explicitList)) for (const c of ch.explicitList) if (typeof c === "string") ids.push(c);
-  return ids;
-}
+        <!-- Query Count -->
+        <div class="kpi-card">
+          <div class="kpi-label">QUERY VOLUME</div>
+          <div class="kpi-val-row">
+            <span class="kpi-value num" id="kpiTotalQueries">0</span>
+            <span class="kpi-delta neutral num" id="kpiQueriesDelta">--</span>
+          </div>
+          <div class="sparkline-wrapper">
+            <canvas id="sparkQueries" class="sparkline"></canvas>
+          </div>
+        </div>
+      </section>
 
-// A2UI icon names are camelCase (locationOn); Material Symbols wants snake_case.
-function iconName(n) { return String(n || "").replace(/([a-z0-9])([A-Z])/g, "$1_$2").replace(/\s+/g, "_").toLowerCase(); }
+      <!-- 3. Charts Grid -->
+      <section class="charts-grid">
+        <!-- Tool Trend Line Chart -->
+        <div class="card">
+          <div class="card-title">
+            <span>Weekly Cost per Tool (8 Weeks)</span>
+            <span style="font-size:0.72rem; color:var(--teal)">Click point to ask agent</span>
+          </div>
+          <div class="chart-container-tall">
+            <canvas id="toolLineChart"></canvas>
+          </div>
+        </div>
 
-function buildNode(id, comps, seen) {
-  if (!id || seen.has(id)) return null;   // missing / cycle guard
-  seen.add(id);
-  const spec = comps[id];
-  if (!spec || typeof spec !== "object") return null;
-  const type = Object.keys(spec)[0];
-  const props = spec[type] || {};
-  const kids = () => childIds(props).map(cid => buildNode(cid, comps, seen)).filter(Boolean);
+        <!-- Team Stacked Bar Chart -->
+        <div class="card">
+          <div class="card-title">
+            <span>Weekly Cost by Team</span>
+            <span style="font-size:0.72rem; color:var(--teal)">Click bar to ask agent</span>
+          </div>
+          <div class="chart-container-tall">
+            <canvas id="teamBarChart"></canvas>
+          </div>
+        </div>
 
-  switch (type) {
-    case "Card": {
-      const d = el("div", "a2card"); kids().forEach(n => d.appendChild(n)); return d;
+        <!-- Signature Chart: Cost Efficiency Quadrant Scatter -->
+        <div class="card full-width">
+          <div class="card-title">
+            <span>Cost Efficiency Quadrant: Query Δ% vs Data Scanned (GB) Δ%</span>
+            <span class="quadrant-header-note">Bubble size = Spend Δ · Click any bubble to investigate with Agent</span>
+          </div>
+          <div class="chart-container-quadrant">
+            <canvas id="quadrantChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Top-5 Drivers Table -->
+        <div class="card full-width">
+          <div class="card-title">
+            <span>Team &amp; Tool Cost Drivers (Selected Week)</span>
+            <span style="font-size:0.72rem; color:var(--text-dim)">Click row to ask agent</span>
+          </div>
+          <div class="table-container">
+            <table class="drivers-table" id="driversTable">
+              <thead>
+                <tr>
+                  <th onclick="sortDrivers('group')">Team &amp; Tool ↕</th>
+                  <th onclick="sortDrivers('top_dashboard')">Top Dashboard ↕</th>
+                  <th onclick="sortDrivers('cost')">Weekly Spend ↕</th>
+                  <th onclick="sortDrivers('cost_delta')">Spend Δ ↕</th>
+                  <th onclick="sortDrivers('queries_delta_pct')">Queries Δ% ↕</th>
+                  <th onclick="sortDrivers('gb_delta_pct')">GB Scanned Δ% ↕</th>
+                  <th>Deterministic Remediation</th>
+                </tr>
+              </thead>
+              <tbody id="driversTbody">
+                <tr><td colspan="7" style="text-align:center; padding:1.5rem; color:var(--text-dim)">Loading cost drivers…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- RIGHT: Agent Chat Panel (35%) -->
+    <aside class="chat-pane">
+      <div class="chat-header">
+        <div class="chat-header-title">
+          <span class="agent-status-dot"></span>
+          <span>Agent Explainer &amp; Remediations</span>
+        </div>
+        <span style="font-size:0.75rem; color:var(--teal);">A2UI &amp; Vertex AI</span>
+      </div>
+
+      <!-- Suggested Prompts Strip -->
+      <div class="chips-strip">
+        <button type="button" class="chat-chip" id="chipReport" onclick="sendPrompt(this.dataset.prompt)">📊 Weekly report</button>
+        <button type="button" class="chat-chip" onclick="sendPrompt('Why did costs rise this week?')">🔍 Why did costs rise?</button>
+        <button type="button" class="chat-chip" onclick="sendPrompt('Break down costs by team in EUR')">💶 Team breakdown in EUR</button>
+      </div>
+
+      <!-- Chat Log -->
+      <div id="log">
+        <div class="msg agent">
+          <div class="bubble">
+            👋 Welcome! I am your <strong>BI Cost Explainer</strong>. I ground every metric directly in your platform data and execute code to verify variances.
+            <br><br>
+            Click any chart data point or driver row on the dashboard to investigate root causes, or choose a prompt above!
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input Form -->
+      <div class="chat-input-area">
+        <form id="form" class="chat-input-form" onsubmit="handleChatSubmit(event)">
+          <input id="input" class="chat-input" placeholder="Ask about spend spikes, root causes, or fixes…" autocomplete="off">
+          <button class="chat-send-btn" type="submit">Send</button>
+        </form>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Global Footer -->
+  <footer>All figures computed from data by code · Illustrations generated by Gemini · Synthetic data</footer>
+
+  <script>
+    /* ==========================================================================
+       State & Constants
+       ========================================================================== */
+    let currentCurrency = 'USD';
+    let fxRate = 0.88; // USD -> EUR
+    let selectedWeek = '';
+    let availableWeeks = [];
+    let summaryData = null;
+    let timeseriesData = null;
+    let driversData = null;
+    let alertThreshold = parseFloat(localStorage.getItem('alertThreshold') || '20');
+
+    // Chart.js instances
+    let toolLineChart = null;
+    let teamBarChart = null;
+    let quadrantChart = null;
+
+    // Palette mapping
+    const TOOL_COLORS = {
+      'Looker': '#14B8A6',        // Teal
+      'Looker Studio': '#F59E0B', // Amber
+      'Tableau': '#06B6D4'        // Cyan
+    };
+
+    const TEAM_COLORS = {
+      'Sales': '#EF4444',         // Red
+      'Marketing': '#8B5CF6',     // Purple
+      'Supply Chain': '#3B82F6',  // Blue
+      'Finance': '#10B981'        // Emerald
+    };
+
+    /* ==========================================================================
+       Formatting Utilities
+       ========================================================================== */
+    function formatMoney(amountUSD) {
+      if (amountUSD == null) return '$0';
+      const val = currentCurrency === 'EUR' ? amountUSD * fxRate : amountUSD;
+      const symbol = currentCurrency === 'EUR' ? '€' : '$';
+      return `${symbol}${Math.round(val).toLocaleString()}`;
     }
-    case "Column":
-    case "List": {
-      const horizontal = type === "List" && props.direction === "horizontal";
-      const d = el("div", horizontal ? "a2row" : "a2col"); kids().forEach(n => d.appendChild(n)); return d;
+
+    function formatMoneyExact(amountUSD) {
+      if (amountUSD == null) return '$0.00';
+      const val = currentCurrency === 'EUR' ? amountUSD * fxRate : amountUSD;
+      const symbol = currentCurrency === 'EUR' ? '€' : '$';
+      return `${symbol}${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
-    case "Row": {
-      const d = el("div", "a2row" + (props.distribution === "spaceBetween" ? " between" : ""));
-      kids().forEach(n => d.appendChild(n)); return d;
+
+    function formatPct(val) {
+      if (val == null) return '0.0%';
+      const sign = val > 0 ? '+' : '';
+      return `${sign}${val.toFixed(1)}%`;
     }
-    case "Text": {
-      const t = el("div", "a2text");
-      const hint = String(props.usageHint || "body").toLowerCase();
-      if (["h1", "h2", "h3", "h4", "h5", "h6"].includes(hint)) t.classList.add("a2-" + hint);
-      else if (hint === "caption") t.classList.add("a2-caption");
-      t.textContent = boundStr(props.text);
-      return t;
+
+    /* ==========================================================================
+       Settings & Currency Toggles
+       ========================================================================== */
+    function toggleSettings() {
+      const modal = document.getElementById('settingsModal');
+      modal.classList.toggle('open');
+      document.getElementById('thresholdInput').value = alertThreshold;
     }
-    case "Divider":
-      return el("hr", "a2divider");
-    case "Image": {
-      const src = boundStr(props.url || props.src);
-      if (!/^https?:\/\//i.test(src)) return null;   // only allow safe URLs
-      const img = el("img", "a2img"); img.src = src; img.alt = boundStr(props.alt) || ""; return img;
+
+    function saveSettings() {
+      const val = parseFloat(document.getElementById('thresholdInput').value) || 20;
+      alertThreshold = val;
+      localStorage.setItem('alertThreshold', String(val));
+      document.getElementById('settingsModal').classList.remove('open');
+      renderInsights();
     }
-    case "Icon": {
-      const s = el("span", "material-symbols-outlined"); s.textContent = iconName(boundStr(props.name) || props.name); return s;
+
+    function setCurrency(cur) {
+      if (currentCurrency === cur) return;
+      currentCurrency = cur;
+      document.getElementById('btnUSD').classList.toggle('active', cur === 'USD');
+      document.getElementById('btnEUR').classList.toggle('active', cur === 'EUR');
+      
+      // Update all financial views
+      renderKPIs();
+      renderInsights();
+      updateCharts();
+      renderDriversTable();
     }
-    default:
-      return null;   // unknown component -> skipped (text fallback covers content)
-  }
-}
 
-// Render one or more A2UI messages (beginRendering + surfaceUpdate) into `container`.
-// Returns true if anything was drawn.
-function renderSurface(messages, container) {
-  const comps = {};
-  const roots = [];
-  for (const m of messages) {
-    if (m.beginRendering && typeof m.beginRendering.root === "string") roots.push(m.beginRendering.root);
-    const su = m.surfaceUpdate;
-    if (su && Array.isArray(su.components)) for (const c of su.components) if (c && c.id && c.component) comps[c.id] = c.component;
-  }
-  let rootIds = roots.filter(r => comps[r]);
-  if (rootIds.length === 0) {   // no valid root given -> infer un-referenced components
-    const referenced = new Set();
-    for (const id in comps) { const spec = comps[id]; childIds(spec[Object.keys(spec)[0]] || {}).forEach(c => referenced.add(c)); }
-    rootIds = Object.keys(comps).filter(id => !referenced.has(id));
-  }
-  let drew = false;
-  for (const rid of rootIds) { const node = buildNode(rid, comps, new Set()); if (node) { container.appendChild(node); drew = true; } }
-  return drew;
-}
+    /* ==========================================================================
+       Data Fetching & Bootstrapping
+       ========================================================================== */
+    async function initDashboard() {
+      try {
+        // 1. Fetch FX rate
+        const fxRes = await fetch('/api/fx');
+        if (fxRes.ok) {
+          const fxJson = await fxRes.json();
+          if (fxJson.rate) fxRate = fxJson.rate;
+        }
 
-// Fallback: pull every Text value out of the messages as plain text.
-function flattenText(messages) {
-  const out = [];
-  for (const m of messages) {
-    const su = m.surfaceUpdate;
-    if (su && Array.isArray(su.components)) for (const c of su.components) if (c && c.component && c.component.Text) out.push(boundStr(c.component.Text.text));
-  }
-  return out.join("\n").trim();
-}
+        // 2. Fetch Timeseries data (8 weeks)
+        const tsRes = await fetch('/api/timeseries');
+        if (tsRes.ok) {
+          timeseriesData = await tsRes.json();
+          availableWeeks = timeseriesData.weeks || [];
+        }
 
-function renderReply(b, parts) {
-  b.textContent = "";   // clear the "…" placeholder
-  const texts = parts.filter(p => p && (p.kind === "text" || (!p.kind && p.text))).map(p => p.text || "");
-  const a2ui = parts.filter(p => p && p.kind === "a2ui" && p.data).map(p => p.data);
+        // Setup week selector (default to latest or 2026-09-14)
+        const sel = document.getElementById('weekSelector');
+        sel.innerHTML = '';
+        availableWeeks.forEach(w => {
+          const opt = document.createElement('option');
+          opt.value = w;
+          opt.textContent = `Week of ${w}`;
+          sel.appendChild(opt);
+        });
 
-  const textStr = texts.join("\n").trim();
-  if (textStr) b.appendChild(el("div", null, textStr));
+        // Default to latest week
+        selectedWeek = availableWeeks[availableWeeks.length - 1] || '2026-09-14';
+        sel.value = selectedWeek;
+        sel.addEventListener('change', (e) => {
+          onWeekChange(e.target.value);
+        });
 
-  if (a2ui.length) {
-    b.classList.add("rich");
-    if (!renderSurface(a2ui, b)) b.appendChild(el("div", null, flattenText(a2ui) || "(no card content)"));
-  }
-  if (!b.childNodes.length) b.textContent = "(no response)";
-  log.scrollTop = log.scrollHeight;
-}
+        // Update report chip prompt
+        updateReportChip(selectedWeek);
 
-async function submitMessage(text) {
-  if (!text) return;
-  bubble("user").textContent = text;
-  input.value = "";
-  const b = bubble("agent"); b.textContent = "…";
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
+        // 3. Load week data & build charts
+        await loadWeekData(selectedWeek);
+        buildCharts();
+
+      } catch (err) {
+        console.error('Error initializing dashboard:', err);
+      }
+    }
+
+    function updateReportChip(wk) {
+      const chip = document.getElementById('chipReport');
+      if (chip) {
+        chip.dataset.prompt = `Give me the weekly cost report for the week of ${wk}`;
+        chip.textContent = `📊 Weekly report for ${wk.slice(5)}`;
+      }
+    }
+
+    async function loadWeekData(wk) {
+      const [sumRes, drivRes] = await Promise.all([
+        fetch(`/api/summary?week=${encodeURIComponent(wk)}`),
+        fetch(`/api/drivers?week=${encodeURIComponent(wk)}`)
+      ]);
+      summaryData = await sumRes.json();
+      driversData = await drivRes.json();
+
+      renderKPIs();
+      renderInsights();
+      renderDriversTable();
+    }
+
+    async function onWeekChange(newWeek) {
+      selectedWeek = newWeek;
+      updateReportChip(newWeek);
+      await loadWeekData(newWeek);
+      updateCharts();
+    }
+
+    /* ==========================================================================
+       Rendering: Insights on Start Strip
+       ========================================================================== */
+    function renderInsights() {
+      if (!driversData || !driversData.insights) return;
+      const { top_driver, red_herring } = driversData.insights;
+      const drivers = driversData.drivers || [];
+
+      // Card 1: Top Cost Driver
+      if (top_driver) {
+        document.getElementById('topDriverTitle').textContent = `${top_driver.team} / ${top_driver.tool}`;
+        document.getElementById('topDriverDetail').innerHTML = `
+          Spend rose by <strong>${formatMoney(top_driver.cost_delta)}</strong> (${formatPct(top_driver.cost_delta_pct)})
+          on <em>${top_driver.top_dashboard}</em>. Fix: <strong>${top_driver.fix_label}</strong>.
+        `;
+        document.getElementById('askTopDriver').onclick = () => {
+          prefillChat(`Why did ${top_driver.team} / ${top_driver.tool} cost increase in the week of ${selectedWeek}?`);
+        };
+      }
+
+      // Card 2: Red-Herring Detector
+      if (red_herring) {
+        document.getElementById('redHerringTitle').textContent = `${red_herring.team} / ${red_herring.tool}`;
+        document.getElementById('redHerringDetail').innerHTML = `
+          Queries jumped <strong>${formatPct(red_herring.queries_delta_pct)}</strong> (${red_herring.queries_delta > 0 ? '+' : ''}${red_herring.queries_delta.toLocaleString()}),
+          yet spend changed only ${formatMoney(red_herring.cost_delta)}. <em>Efficient growth, no action needed</em>.
+        `;
+        document.getElementById('askRedHerring').onclick = () => {
+          prefillChat(`Why did ${red_herring.team} / ${red_herring.tool} query count surge without a cost spike in the week of ${selectedWeek}?`);
+        };
+      }
+
+      // Card 3: Anomaly Alerts Count
+      const alertDrivers = drivers.filter(d => d.cost_delta_pct >= alertThreshold && d.cost_delta > 0);
+      document.getElementById('alertCountTitle').textContent = `${alertDrivers.length} Group${alertDrivers.length === 1 ? '' : 's'} > ${alertThreshold}%`;
+      if (alertDrivers.length > 0) {
+        const names = alertDrivers.map(d => `${d.team} ${d.tool}`).join(', ');
+        document.getElementById('alertCountDetail').textContent = `Cost increase exceeded threshold: ${names}.`;
+      } else {
+        document.getElementById('alertCountDetail').textContent = `All groups remained below the +${alertThreshold}% cost threshold.`;
+      }
+      document.getElementById('askAlertCount').onclick = () => {
+        prefillChat(`What groups exceeded the ${alertThreshold}% cost increase threshold in the week of ${selectedWeek} and what should we do?`);
+      };
+    }
+
+    /* ==========================================================================
+       Rendering: KPIs & Sparklines
+       ========================================================================== */
+    function renderKPIs() {
+      if (!summaryData) return;
+
+      // 1. Total spend
+      document.getElementById('kpiTotalCost').textContent = formatMoney(summaryData.total_cost);
+      const deltaEl = document.getElementById('kpiCostDelta');
+      const isUp = summaryData.cost_delta > 0;
+      deltaEl.textContent = `${isUp ? '▲' : '▼'} ${formatMoney(Math.abs(summaryData.cost_delta))}`;
+      deltaEl.className = `kpi-delta ${isUp ? 'up-bad' : 'down-good'} num`;
+
+      // 2. Spend variance %
+      document.getElementById('kpiVarianceVal').textContent = `${isUp ? '+' : ''}${formatMoney(summaryData.cost_delta)}`;
+      const pctEl = document.getElementById('kpiVariancePct');
+      pctEl.textContent = formatPct(summaryData.cost_delta_pct);
+      pctEl.className = `kpi-delta ${isUp ? 'up-bad' : 'down-good'} num`;
+
+      // 3. Data scanned (GB)
+      document.getElementById('kpiTotalGb').textContent = `${Math.round(summaryData.total_gb).toLocaleString()} GB`;
+      const gbDeltaEl = document.getElementById('kpiGbDelta');
+      const gbUp = summaryData.gb_delta > 0;
+      gbDeltaEl.textContent = `${gbUp ? '▲' : '▼'} ${formatPct(summaryData.gb_delta_pct)}`;
+      gbDeltaEl.className = `kpi-delta ${gbUp ? 'up-bad' : 'neutral'} num`;
+
+      // 4. Queries
+      document.getElementById('kpiTotalQueries').textContent = summaryData.total_queries.toLocaleString();
+      const qDeltaEl = document.getElementById('kpiQueriesDelta');
+      const qUp = summaryData.queries_delta > 0;
+      qDeltaEl.textContent = `${qUp ? '▲' : '▼'} ${formatPct(summaryData.queries_delta_pct)}`;
+      qDeltaEl.className = `kpi-delta neutral num`;
+
+      // Draw sparklines
+      if (summaryData.sparklines) {
+        const fxMult = currentCurrency === 'EUR' ? fxRate : 1.0;
+        const sparkCosts = summaryData.sparklines.cost.map(c => c * fxMult);
+        drawSparkline('sparkCost', sparkCosts, isUp ? '#EF4444' : '#14B8A6');
+        drawSparkline('sparkVariance', sparkCosts, '#F59E0B');
+        drawSparkline('sparkGb', summaryData.sparklines.gb, '#06B6D4');
+        drawSparkline('sparkQueries', summaryData.sparklines.queries, '#8B5CF6');
+      }
+    }
+
+    function drawSparkline(canvasId, values, color = '#14B8A6') {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas || !values || values.length < 2) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.clientWidth * window.devicePixelRatio;
+      const h = canvas.height = canvas.clientHeight * window.devicePixelRatio;
+      ctx.clearRect(0, 0, w, h);
+
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const range = (max - min) || 1;
+      const pad = 4 * window.devicePixelRatio;
+      const step = (w - pad * 2) / (values.length - 1);
+
+      ctx.beginPath();
+      values.forEach((v, i) => {
+        const x = pad + i * step;
+        const y = h - pad - ((v - min) / range) * (h - pad * 2);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2 * window.devicePixelRatio;
+      ctx.stroke();
+
+      // Translucent area fill
+      ctx.lineTo(pad + (values.length - 1) * step, h);
+      ctx.lineTo(pad, h);
+      ctx.closePath();
+      ctx.fillStyle = color + '25';
+      ctx.fill();
+    }
+
+    /* ==========================================================================
+       Rendering: Charts (Line, Stacked Bar, Quadrant Scatter)
+       ========================================================================== */
+
+    // Custom Plugin: Quadrant background regions and corner text annotations
+    const quadrantAnnotationPlugin = {
+      id: 'quadrantAnnotation',
+      beforeDraw(chart) {
+        if (chart.config.type !== 'scatter' && chart.config.type !== 'bubble') return;
+        const { ctx, chartArea: { top, bottom, left, right }, scales: { x, y } } = chart;
+        
+        const xZero = Math.min(Math.max(x.getPixelForValue(0), left), right);
+        const yZero = Math.min(Math.max(y.getPixelForValue(0), top), bottom);
+
+        ctx.save();
+        
+        // Dashed Crosshair lines at (0, 0)
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.25)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+
+        ctx.beginPath();
+        ctx.moveTo(xZero, top);
+        ctx.lineTo(xZero, bottom);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(left, yZero);
+        ctx.lineTo(right, yZero);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Quadrant Corner Labels
+        ctx.font = '600 11px Inter, sans-serif';
+
+        // 1. Top-Left: "Full scans — add partition filter / extract"
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.85)';
+        ctx.textAlign = 'left';
+        ctx.fillText('🔴 Full scans — add partition filter / extract', left + 14, top + 22);
+
+        // 2. Top-Right: "More users on expensive dashboard — schedule"
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.85)';
+        ctx.textAlign = 'right';
+        ctx.fillText('🟡 More users on expensive dashboard — schedule', right - 14, top + 22);
+
+        // 3. Bottom-Right: "Efficient growth — no action"
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.85)';
+        ctx.textAlign = 'right';
+        ctx.fillText('🟢 Efficient growth — no action', right - 14, bottom - 14);
+
+        // 4. Bottom-Left: "Declining"
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+        ctx.textAlign = 'left';
+        ctx.fillText('⚪ Declining / Normal', left + 14, bottom - 14);
+
+        ctx.restore();
+      }
+    };
+
+    // Custom Plugin: Selected week highlight vertical band on Line Chart
+    const selectedWeekBandPlugin = {
+      id: 'selectedWeekBand',
+      beforeDraw(chart) {
+        if (!selectedWeek || !timeseriesData || chart.config.type !== 'line') return;
+        const weekIdx = timeseriesData.weeks.indexOf(selectedWeek);
+        if (weekIdx === -1) return;
+
+        const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+        const xPos = x.getPixelForValue(weekIdx);
+        const width = (x.width / timeseriesData.weeks.length) * 0.75;
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(20, 184, 166, 0.12)';
+        ctx.fillRect(xPos - width / 2, top, width, bottom - top);
+        
+        ctx.strokeStyle = 'rgba(20, 184, 166, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(xPos, top);
+        ctx.lineTo(xPos, bottom);
+        ctx.stroke();
+        ctx.restore();
+      }
+    };
+
+    function buildCharts() {
+      if (!timeseriesData) return;
+      const fxMult = currentCurrency === 'EUR' ? fxRate : 1.0;
+      const currencySymbol = currentCurrency === 'EUR' ? '€' : '$';
+
+      // 1. Tool Trend Line Chart
+      const toolCtx = document.getElementById('toolLineChart').getContext('2d');
+      const toolDatasets = timeseriesData.tools.map(tool => {
+        const color = TOOL_COLORS[tool] || '#94A3B8';
+        return {
+          label: tool,
+          data: timeseriesData.by_tool[tool].map(v => Math.round(v * fxMult)),
+          borderColor: color,
+          backgroundColor: color,
+          tension: 0.25,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+          borderWidth: 2.5
+        };
+      });
+
+      toolLineChart = new Chart(toolCtx, {
+        type: 'line',
+        data: {
+          labels: timeseriesData.weeks.map(w => w.slice(5)),
+          datasets: toolDatasets
+        },
+        plugins: [selectedWeekBandPlugin],
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { labels: { color: '#94A3B8', boxWidth: 12, font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ${ctx.dataset.label}: ${currencySymbol}${ctx.parsed.y.toLocaleString()}`
+              }
+            }
+          },
+          scales: {
+            x: { grid: { color: 'rgba(32, 46, 76, 0.4)' }, ticks: { color: '#94A3B8' } },
+            y: { grid: { color: 'rgba(32, 46, 76, 0.4)' }, ticks: { color: '#94A3B8', callback: v => `${currencySymbol}${v}` } }
+          },
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const el = elements[0];
+              const wk = timeseriesData.weeks[el.index];
+              const tool = toolDatasets[el.datasetIndex].label;
+              prefillChat(`Why did ${tool} spend change in the week of ${wk}?`);
+            }
+          }
+        }
+      });
+
+      // 2. Team Stacked Bar Chart
+      const teamCtx = document.getElementById('teamBarChart').getContext('2d');
+      const teamDatasets = timeseriesData.teams.map(team => {
+        const color = TEAM_COLORS[team] || '#94A3B8';
+        return {
+          label: team,
+          data: timeseriesData.by_team[team].map(v => Math.round(v * fxMult)),
+          backgroundColor: color,
+          borderRadius: 4
+        };
+      });
+
+      teamBarChart = new Chart(teamCtx, {
+        type: 'bar',
+        data: {
+          labels: timeseriesData.weeks.map(w => w.slice(5)),
+          datasets: teamDatasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#94A3B8', boxWidth: 12, font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ${ctx.dataset.label}: ${currencySymbol}${ctx.parsed.y.toLocaleString()}`
+              }
+            }
+          },
+          scales: {
+            x: { stacked: true, grid: { color: 'rgba(32, 46, 76, 0.4)' }, ticks: { color: '#94A3B8' } },
+            y: { stacked: true, grid: { color: 'rgba(32, 46, 76, 0.4)' }, ticks: { color: '#94A3B8', callback: v => `${currencySymbol}${v}` } }
+          },
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const el = elements[0];
+              const wk = timeseriesData.weeks[el.index];
+              const team = teamDatasets[el.datasetIndex].label;
+              prefillChat(`What drove ${team} team BI costs in the week of ${wk}?`);
+            }
+          }
+        }
+      });
+
+      // 3. Signature Chart: Cost Efficiency Quadrant Scatter
+      buildQuadrantChart();
+    }
+
+    function buildQuadrantChart() {
+      if (!driversData || !driversData.drivers) return;
+      const fxMult = currentCurrency === 'EUR' ? fxRate : 1.0;
+      const currencySymbol = currentCurrency === 'EUR' ? '€' : '$';
+
+      const points = driversData.drivers.map(d => {
+        const absDelta = Math.abs(d.cost_delta) * fxMult;
+        // Scale radius smoothly between 7px and 28px
+        const r = Math.min(Math.max(Math.sqrt(absDelta) * 0.45, 6.5), 28);
+        return {
+          x: d.queries_delta_pct,
+          y: d.gb_delta_pct,
+          r: r,
+          raw: d
+        };
+      });
+
+      const quadCtx = document.getElementById('quadrantChart').getContext('2d');
+      quadrantChart = new Chart(quadCtx, {
+        type: 'bubble',
+        data: {
+          datasets: [{
+            label: 'Teams & Tools',
+            data: points,
+            backgroundColor: (ctx) => {
+              const d = ctx.raw?.raw;
+              if (!d) return 'rgba(20, 184, 166, 0.6)';
+              if (d.team === 'Sales' && d.tool === 'Looker Studio') return 'rgba(239, 68, 68, 0.85)';
+              if (d.team === 'Marketing' && d.tool === 'Looker Studio') return 'rgba(16, 185, 129, 0.85)';
+              return 'rgba(59, 130, 246, 0.7)';
+            },
+            borderColor: '#FFFFFF',
+            borderWidth: 1.5,
+            hoverBorderWidth: 3
+          }]
+        },
+        plugins: [quadrantAnnotationPlugin],
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                title: (ctx) => {
+                  const d = ctx[0].raw.raw;
+                  return `${d.team} — ${d.tool}`;
+                },
+                label: (ctx) => {
+                  const d = ctx.raw.raw;
+                  return [
+                    ` Top Dashboard: ${d.top_dashboard}`,
+                    ` Spend Δ: ${formatMoney(d.cost_delta)} (${formatPct(d.cost_delta_pct)})`,
+                    ` Queries Δ%: ${formatPct(d.queries_delta_pct)} (${d.queries_delta > 0 ? '+' : ''}${d.queries_delta})`,
+                    ` GB Scanned Δ%: ${formatPct(d.gb_delta_pct)} (${d.gb_delta > 0 ? '+' : ''}${d.gb_delta.toFixed(1)} GB)`,
+                    ` Fix: ${d.fix_label}`
+                  ];
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: { display: true, text: 'Query Count Change (Δ %)', color: '#94A3B8', font: { size: 12, weight: '600' } },
+              grid: { color: 'rgba(32, 46, 76, 0.4)' },
+              ticks: { color: '#94A3B8', callback: v => `${v}%` }
+            },
+            y: {
+              title: { display: true, text: 'Data Scanned Change (GB Δ %)', color: '#94A3B8', font: { size: 12, weight: '600' } },
+              grid: { color: 'rgba(32, 46, 76, 0.4)' },
+              ticks: { color: '#94A3B8', callback: v => `${v}%` }
+            }
+          },
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const el = elements[0];
+              const d = points[el.index].raw;
+              prefillChat(`Why did ${d.team} / ${d.tool} cost change in the week of ${selectedWeek}?`);
+            }
+          }
+        }
+      });
+    }
+
+    function updateCharts() {
+      const fxMult = currentCurrency === 'EUR' ? fxRate : 1.0;
+      const currencySymbol = currentCurrency === 'EUR' ? '€' : '$';
+
+      // 1. Update line chart
+      if (toolLineChart && timeseriesData) {
+        toolLineChart.data.datasets.forEach((ds, idx) => {
+          const tool = timeseriesData.tools[idx];
+          ds.data = timeseriesData.by_tool[tool].map(v => Math.round(v * fxMult));
+        });
+        toolLineChart.update();
+      }
+
+      // 2. Update bar chart
+      if (teamBarChart && timeseriesData) {
+        teamBarChart.data.datasets.forEach((ds, idx) => {
+          const team = timeseriesData.teams[idx];
+          ds.data = timeseriesData.by_team[team].map(v => Math.round(v * fxMult));
+        });
+        teamBarChart.update();
+      }
+
+      // 3. Update quadrant
+      if (quadrantChart && driversData) {
+        const points = driversData.drivers.map(d => {
+          const absDelta = Math.abs(d.cost_delta) * fxMult;
+          const r = Math.min(Math.max(Math.sqrt(absDelta) * 0.45, 6.5), 28);
+          return {
+            x: d.queries_delta_pct,
+            y: d.gb_delta_pct,
+            r: r,
+            raw: d
+          };
+        });
+        quadrantChart.data.datasets[0].data = points;
+        quadrantChart.update();
+      }
+    }
+
+    /* ==========================================================================
+       Rendering: Top-5 Drivers Table
+       ========================================================================== */
+    let currentSort = { col: 'cost_delta', asc: false };
+
+    function sortDrivers(col) {
+      if (currentSort.col === col) {
+        currentSort.asc = !currentSort.asc;
+      } else {
+        currentSort.col = col;
+        currentSort.asc = false;
+      }
+      renderDriversTable();
+    }
+
+    function renderDriversTable() {
+      if (!driversData || !driversData.drivers) return;
+      const tbody = document.getElementById('driversTbody');
+      tbody.innerHTML = '';
+
+      const drivers = [...driversData.drivers];
+      drivers.sort((a, b) => {
+        let va = a[currentSort.col];
+        let vb = b[currentSort.col];
+        if (typeof va === 'string') {
+          return currentSort.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+        }
+        return currentSort.asc ? (va - vb) : (vb - va);
+      });
+
+      // Display top rows
+      drivers.slice(0, 8).forEach(d => {
+        const tr = document.createElement('tr');
+        
+        // Badge style based on fix
+        let badgeClass = 'badge-normal';
+        if (d.fix_label.includes('full scans')) badgeClass = 'badge-scan';
+        else if (d.fix_label.includes('growth')) badgeClass = 'badge-growth';
+        else if (d.fix_label.includes('schedule')) badgeClass = 'badge-schedule';
+
+        const isCostUp = d.cost_delta > 0;
+        const deltaColor = isCostUp ? 'var(--red)' : (d.cost_delta < 0 ? 'var(--green)' : 'var(--text-muted)');
+
+        tr.innerHTML = `
+          <td><strong>${d.team}</strong> <span style="color:var(--text-dim)">/ ${d.tool}</span></td>
+          <td>${d.top_dashboard}</td>
+          <td class="num">${formatMoney(d.cost)}</td>
+          <td class="num" style="color:${deltaColor}; font-weight:600;">
+            ${isCostUp ? '▲' : (d.cost_delta < 0 ? '▼' : '')} ${formatMoney(Math.abs(d.cost_delta))}
+            <span style="font-size:0.7rem; color:var(--text-dim)">(${formatPct(d.cost_delta_pct)})</span>
+          </td>
+          <td class="num">${formatPct(d.queries_delta_pct)}</td>
+          <td class="num">${formatPct(d.gb_delta_pct)}</td>
+          <td><span class="badge ${badgeClass}">${d.fix_label}</span></td>
+        `;
+
+        tr.onclick = () => {
+          prefillChat(`Why did ${d.team} / ${d.tool} cost change in the week of ${selectedWeek}?`);
+        };
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* ==========================================================================
+       Agent Chat & A2UI Renderer
+       ========================================================================== */
+    const log = document.getElementById("log");
+    const input = document.getElementById("input");
+
+    function el(tag, cls, text) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text != null) e.textContent = text;
+      return e;
+    }
+
+    function bubble(who) {
+      const m = el("div", "msg " + who);
+      const b = el("div", "bubble");
+      m.appendChild(b);
+      log.appendChild(m);
+      log.scrollTop = log.scrollHeight;
+      return b;
+    }
+
+    function prefillChat(prompt) {
+      input.value = prompt;
+      input.focus();
+      // Scroll chat smoothly on mobile
+      if (window.innerWidth <= 1024) {
+        document.querySelector('.chat-pane').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function sendPrompt(prompt) {
+      input.value = prompt;
+      submitMessage(prompt);
+    }
+
+    function handleChatSubmit(ev) {
+      ev.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      submitMessage(text);
+    }
+
+    async function submitMessage(text) {
+      if (!text) return;
+      bubble("user").textContent = text;
+      input.value = "";
+      const b = bubble("agent");
+      b.textContent = "…";
+
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+        const raw = await res.text();
+        let data;
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          throw new Error(`Server returned non-JSON (HTTP ${res.status}). ${raw.slice(0, 300)}`);
+        }
+        renderReply(b, data.parts || []);
+      } catch (e) {
+        b.textContent = "Error: " + e.message;
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+     * A2UI Mini-Renderer
+     * ------------------------------------------------------------------------ */
+    function boundStr(v) {
+      if (v == null) return "";
+      if (typeof v === "string") return v;
+      if (typeof v.literalString === "string") return v.literalString;
+      return "";
+    }
+
+    function childIds(props) {
+      const ids = [];
+      if (props && typeof props.child === "string") ids.push(props.child);
+      const ch = props && props.children;
+      if (ch && Array.isArray(ch.explicitList)) {
+        for (const c of ch.explicitList) if (typeof c === "string") ids.push(c);
+      }
+      return ids;
+    }
+
+    function iconName(n) {
+      return String(n || "").replace(/([a-z0-9])([A-Z])/g, "$1_$2").replace(/\s+/g, "_").toLowerCase();
+    }
+
+    function buildNode(id, comps, seen) {
+      if (!id || seen.has(id)) return null;
+      seen.add(id);
+      const spec = comps[id];
+      if (!spec || typeof spec !== "object") return null;
+      const type = Object.keys(spec)[0];
+      const props = spec[type] || {};
+      const kids = () => childIds(props).map(cid => buildNode(cid, comps, seen)).filter(Boolean);
+
+      switch (type) {
+        case "Card": {
+          const d = el("div", "a2card");
+          kids().forEach(n => d.appendChild(n));
+          return d;
+        }
+        case "Column":
+        case "List": {
+          const horizontal = type === "List" && props.direction === "horizontal";
+          const d = el("div", horizontal ? "a2row" : "a2col");
+          kids().forEach(n => d.appendChild(n));
+          return d;
+        }
+        case "Row": {
+          const d = el("div", "a2row" + (props.distribution === "spaceBetween" ? " between" : ""));
+          kids().forEach(n => d.appendChild(n));
+          return d;
+        }
+        case "Text": {
+          const t = el("div", "a2text");
+          const hint = String(props.usageHint || "body").toLowerCase();
+          if (["h1", "h2", "h3", "h4", "h5", "h6"].includes(hint)) t.classList.add("a2-" + hint);
+          else if (hint === "caption") t.classList.add("a2-caption");
+          t.textContent = boundStr(props.text);
+          return t;
+        }
+        case "Divider":
+          return el("hr", "a2divider");
+        case "Image": {
+          const src = boundStr(props.url || props.src);
+          if (!/^https?:\/\//i.test(src)) return null;
+          const img = el("img", "a2img");
+          img.src = src;
+          img.alt = boundStr(props.alt) || "";
+          return img;
+        }
+        case "Icon": {
+          const s = el("span", "material-symbols-outlined");
+          s.textContent = iconName(boundStr(props.name) || props.name);
+          return s;
+        }
+        default:
+          return null;
+      }
+    }
+
+    function renderSurface(messages, container) {
+      const comps = {};
+      const roots = [];
+      for (const m of messages) {
+        if (m.beginRendering && typeof m.beginRendering.root === "string") roots.push(m.beginRendering.root);
+        const su = m.surfaceUpdate;
+        if (su && Array.isArray(su.components)) {
+          for (const c of su.components) if (c && c.id && c.component) comps[c.id] = c.component;
+        }
+      }
+      let rootIds = roots.filter(r => comps[r]);
+      if (rootIds.length === 0) {
+        const referenced = new Set();
+        for (const id in comps) {
+          const spec = comps[id];
+          childIds(spec[Object.keys(spec)[0]] || {}).forEach(c => referenced.add(c));
+        }
+        rootIds = Object.keys(comps).filter(id => !referenced.has(id));
+      }
+      let drew = false;
+      for (const rid of rootIds) {
+        const node = buildNode(rid, comps, new Set());
+        if (node) { container.appendChild(node); drew = true; }
+      }
+      return drew;
+    }
+
+    function flattenText(messages) {
+      const out = [];
+      for (const m of messages) {
+        const su = m.surfaceUpdate;
+        if (su && Array.isArray(su.components)) {
+          for (const c of su.components) {
+            if (c && c.component && c.component.Text) out.push(boundStr(c.component.Text.text));
+          }
+        }
+      }
+      return out.join("\n").trim();
+    }
+
+    function renderReply(b, parts) {
+      b.textContent = "";
+      const texts = parts.filter(p => p && (p.kind === "text" || (!p.kind && p.text))).map(p => p.text || "");
+      const a2ui = parts.filter(p => p && p.kind === "a2ui" && p.data).map(p => p.data);
+
+      const textStr = texts.join("\n").trim();
+      if (textStr) b.appendChild(el("div", null, textStr));
+
+      if (a2ui.length) {
+        b.classList.add("rich");
+        if (!renderSurface(a2ui, b)) b.appendChild(el("div", null, flattenText(a2ui) || "(no card content)"));
+      }
+      if (!b.childNodes.length) b.textContent = "(no response)";
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Start everything on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      initDashboard();
     });
-    const raw = await res.text();
-    let data;
-    try { data = JSON.parse(raw); }
-    catch { throw new Error(`Server returned non-JSON (HTTP ${res.status}). ${raw.slice(0, 300)}`); }
-    renderReply(b, data.parts || []);
-  } catch (e) {
-    b.textContent = "Error: " + e.message;
-  }
-}
-
-// Example prompt chips
-document.querySelectorAll(".example-chip").forEach(btn => {
-  btn.addEventListener("click", () => {
-    submitMessage(btn.dataset.prompt);
-  });
-});
-
-// Form submit
-form.addEventListener("submit", (ev) => {
-  ev.preventDefault();
-  submitMessage(input.value.trim());
-});
-</script>
+  </script>
 </body>
 </html>
